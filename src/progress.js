@@ -97,7 +97,9 @@
     if (targetElement.tagName.toLowerCase() === 'body') {
       progressElementContainer.style.position = 'fixed';
     } else {
-      progressElementContainer.style.position = 'absolute';
+      if (!this._options.settleContainer) {
+        progressElementContainer.style.position = 'absolute';
+      }
     }
 
     progressElementContainer.setAttribute("data-progressjs", window._progressjsId);
@@ -179,7 +181,10 @@
         }
 
         var percentElement = _getPercentElement(targetElement);
-        percentElement.style.width = parseInt(percent) + '%';
+
+        if (percentElement) {
+          percentElement.style.width = parseInt(percent) + '%';
+        }
 
         var percentElement  = percentElement.querySelector(".progressjs-percent");
         var existingPercent = parseInt(percentElement.innerHTML.replace('%', ''));
@@ -345,7 +350,16 @@
     if (!document.querySelector(".progressjs-container")) {
       var containerElement = document.createElement("div");
       containerElement.className = "progressjs-container";
-      document.body.appendChild(containerElement);
+      if (!this._options.settleContainer) {
+        document.body.appendChild(containerElement);
+      }
+      else {
+        var i = 0, l = this._targetElement.length;
+
+        for (; i < l; i++) {
+          this._targetElement[i].appendChild(containerElement);
+        }
+      }
     }
   }
 
@@ -361,6 +375,9 @@
   function _getOffset(element) {
     var elementPosition = {};
 
+    elementPosition.width = element.clientWidth;
+    elementPosition.height = element.clientHeight;
+/*
     if (element.tagName.toLowerCase() === 'body') {
       //set width
       elementPosition.width = element.clientWidth;
@@ -372,7 +389,7 @@
       //set height
       elementPosition.height = element.offsetHeight;
     }
-
+*/
     //calculate element top and left
     var _x = 0;
     var _y = 0;
